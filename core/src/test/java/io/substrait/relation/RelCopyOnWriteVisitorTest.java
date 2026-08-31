@@ -41,7 +41,7 @@ class RelCopyOnWriteVisitorTest extends TestBase {
         extensions.getWindowFunction(
             SimpleExtension.FunctionAnchor.of(
                 DefaultExtensionCatalog.FUNCTIONS_ARITHMETIC, "lead:any"));
-    Rel input = sb.namedScan(Arrays.asList("test"), Arrays.asList("a"), Arrays.asList(R.I64));
+    Rel input = sb.namedScan(Arrays.asList("test"), Arrays.asList("a"), Arrays.asList(R.I32));
     ConsistentPartitionWindow window =
         ConsistentPartitionWindow.builder()
             .input(input)
@@ -56,6 +56,12 @@ class RelCopyOnWriteVisitorTest extends TestBase {
                         .lowerBound(WindowBound.Preceding.of(sb.i32(5)))
                         .upperBound(WindowBound.Following.of(sb.i32(7)))
                         .boundsType(Expression.WindowBoundsType.RANGE)
+                        .build()))
+            .sorts(
+                Arrays.asList(
+                    Expression.SortField.builder()
+                        .expr(sb.fieldReference(input, 0))
+                        .direction(Expression.SortDirection.ASC_NULLS_FIRST)
                         .build()))
             .build();
 
