@@ -1565,6 +1565,18 @@ class SubstraitRelNodeConverterTest extends PlanTestBase {
     }
 
     @Test
+    void rejectsHashDistributionWithoutKeys() {
+      RelNode exchange =
+          builder.values(new String[] {"a"}, 1).exchange(RelDistributions.hash(List.of())).build();
+
+      UnsupportedOperationException e =
+          assertThrows(
+              UnsupportedOperationException.class,
+              () -> SubstraitRelVisitor.convert(exchange, converterProvider));
+      assertEquals("A hash distribution without keys is not supported", e.getMessage());
+    }
+
+    @Test
     void rejectsSortExchange() {
       RelNode exchange =
           builder

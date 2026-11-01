@@ -811,6 +811,11 @@ public class SubstraitRelVisitor extends RelNodeVisitor<Rel, RuntimeException> {
     // A Calcite plan carries no partition count; 0 leaves it to the consumer.
     switch (distribution.getType()) {
       case HASH_DISTRIBUTED:
+        // A Substrait scatter exchange hashes on one or more fields.
+        if (distribution.getKeys().isEmpty()) {
+          throw new UnsupportedOperationException(
+              "A hash distribution without keys is not supported");
+        }
         return ScatterExchange.builder()
             .input(input)
             .addAllFields(
